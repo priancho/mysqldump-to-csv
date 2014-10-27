@@ -2,17 +2,27 @@
 import fileinput
 import csv
 import sys
+import re
+
 
 # This prevents prematurely closed pipes from raising
 # an exception in Python
 from signal import signal, SIGPIPE, SIG_DFL
 signal(SIGPIPE, SIG_DFL)
 
+
 def is_insert(line):
     """
     Returns true if the line begins a SQL insert statement.
     """
     return line.startswith('INSERT INTO') or False
+
+
+def get_insert_prefix(line):
+    """
+    Return the string from the beginning of the insert statement to the "VALUES".
+    """
+    return re.search("INSERT INTO `.*` VALUES", line).group(0) 
 
 
 def get_values(line):
@@ -39,21 +49,29 @@ def parse_values(values, outfile):
     """
     latest_row = []
 
-    reader = csv.reader([values], delimiter=',',
+    reader = csv.reader([values], 
+                        delimiter=',',
                         doublequote=False,
                         escapechar='\\',
                         quotechar="'",
                         strict=True
     )
 
-    writer = csv.writer(outfile, quoting=csv.QUOTE_MINIMAL)
+    writer = csv.writer(outfile, delimiter='\t', quoting=csv.QUOTE_MINIMAL)
     for reader_row in reader:
         for column in reader_row:
-            # If our current string is empty...
-            if len(column) == 0:
-                continue
-            # If our string starts with an open paren
-            if column[0] == "(":
+            print >> sys.stdout, column
+            
+	    ### This original routine will skip printing empty columns
+	    ### and causes a problem since column order will not be maintained.
+	    ###
+	    ### # If our current string is empty...
+            ### if len(column) == 0:
+            ###     continue
+            ### # If our string starts with an open paren
+            ### if column and column[0] == "(":
+
+	    if column and column[0] == "(":
                 # Assume that this column does not begin
                 # a new row.
                 new_row = False
@@ -85,7 +103,8 @@ def parse_values(values, outfile):
                 # opening parentheses.
                 if len(latest_row) == 0:
                     column = column[1:]
-            # Add our column to the row we're working on.
+            
+	    # Add our column to the row we're working on.
             latest_row.append(column)
 
 
@@ -100,6 +119,9 @@ def main():
         for line in fileinput.input():
             # Look for an INSERT statement and parse it.
             if is_insert(line):
+	        # Print the prefix of the insert statement to show its table name.
+		print >> sys.stdout, get_insert_prefix(line)
+
                 values = get_values(line)
                 if values_sanity_check(values):
                     parse_values(values, sys.stdout)

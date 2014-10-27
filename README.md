@@ -1,4 +1,8 @@
 # MySQL dump to CSV
+
+## Change log
+* 2014/10/27 - Master branch ignores empty columns. So it is difficult to track the column index of a value in a given CSV output. This branch will output empty string as it is and the number of columns of all rows will remain unchanged.
+
 ## Background
 A quickly-hacked-together Python script to turn mysqldump files to CSV files. Optimized for Wikipedia database dumps.
 
@@ -23,8 +27,8 @@ The following SQL:
 
 is turned into the following CSV:
 
-    1,0,April,1,0,0,0.778582929065,20140312223924,20140312223929,4657771,20236,0
-    2,0,August,0,0,0,0.123830928525,20140312221818,20140312221822,4360163,11466,0
+    1<tab/>0<tab/>April<tab/><tab/>1<tab/>0<tab/>0<tab/>0.778582929065<tab/>20140312223924<tab/>20140312223929<tab/>4657771<tab/>20236<tab/>0
+    2<tab/>0<tab/>August<tab/><tab/>0<tab/>0<tab/>0<tab/>0.123830928525<tab/>20140312221818<tab/>20140312221822<tab/>4360163<tab/>11466<tab/>0
 
 It's not too difficult to see what is going on, but you can certainly look at the source code to see exactly how the transformation is made.
 

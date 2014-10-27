@@ -1,8 +1,8 @@
 # MySQL dump to CSV
 
 ## Change log
-* 2014/10/27 - Master branch ignores empty columns. So it is difficult to track the column index of a value in a given CSV output. This branch will output empty string as it is and the number of columns of all rows will remain unchanged.
-* 2014/10/27 - Fix for the previous bug that happens where one column is a string ending in `)` and the next column is a string starting in `(`. The previous logic suggested that the parentheses would be stripped. This bugfix ignores parentheses appearing inside string values.
+* 2014/10/27 - A bugfix: The [RFC4180] mentions that each line of a CSV format data should contain the same number of columns throughout the file. However, the previous version does not satisfy this condition since it ignores columns having empty values. This patch fixes this behavior.
+* 2014/10/27 - A bugfix: The previous version cannot deal with the situation where one column is a string ending in `)` and the next column is a string starting in `(`. This bugfix solves this problem by ignoring any parentheses appearing inside string values.
 
 ## Background
 A quickly-hacked-together Python script to turn mysqldump files to CSV files. Optimized for Wikipedia database dumps.
@@ -36,3 +36,5 @@ It's not too difficult to see what is going on, but you can certainly look at th
 ## Todo
  * A rigorous series of unit tests, proving that this works on a diverse set of MySQL dump files without any side effects
  * Some more documentation
+
+[RFC4180]: http://tools.ietf.org/html/rfc4180.html

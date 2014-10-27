@@ -2,6 +2,7 @@
 
 ## Change log
 * 2014/10/27 - Master branch ignores empty columns. So it is difficult to track the column index of a value in a given CSV output. This branch will output empty string as it is and the number of columns of all rows will remain unchanged.
+* 2014/10/27 - Fix for the previous bug that happens where one column is a string ending in `)` and the next column is a string starting in `(`. The previous logic suggested that the parentheses would be stripped. This bugfix ignores parentheses appearing inside string values.
 
 ## Background
 A quickly-hacked-together Python script to turn mysqldump files to CSV files. Optimized for Wikipedia database dumps.
@@ -35,4 +36,3 @@ It's not too difficult to see what is going on, but you can certainly look at th
 ## Todo
  * A rigorous series of unit tests, proving that this works on a diverse set of MySQL dump files without any side effects
  * Some more documentation
- * A solution to a bug where one column is a string ending in `)` and the next column is a string starting in `(`. The current program logic suggests that the parentheses would be stripped.

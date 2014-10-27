@@ -101,7 +101,8 @@ def parse_values(values, outfile):
     while True:
         row = get_raw_row(values, sidx)
         # Stop if there is no more rows remain
-        break if row == '':
+        if row == '':
+            break
         # Strip away a pair of parentheses and store it
         tbl.append(row[1:-1])
         sidx += len(row)
@@ -133,7 +134,7 @@ def main():
             # Look for an INSERT statement and parse it.
             if is_insert(line):
             # Print the prefix of the insert statement to show its table name.
-                # print >> sys.stdout, get_insert_prefix(line)
+                print >> sys.stdout, get_insert_prefix(line)
 
                 values = get_values(line)
                 if values_sanity_check(values):

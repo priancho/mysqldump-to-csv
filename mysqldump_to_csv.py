@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import fileinput
 import csv
 import sys
@@ -52,7 +54,6 @@ def get_raw_row(values, sidx):
     """
 
     # Get to the start point
-    sidx = values.find('(', sidx)
     eidx = -1
     
     # Return an empty string if there is no more data
@@ -82,9 +83,10 @@ def get_raw_row(values, sidx):
         # Check the end of a row
         ###
         if b_inside_str == False and values[idx] == ')':
+            # eidx points to the comma or the EOS
             eidx = idx+1
             break
- 
+
     assert eidx != -1, 'Can not find the end of a row'
     return values[sidx:eidx]
 
@@ -105,7 +107,8 @@ def parse_values(values, outfile):
             break
         # Strip away a pair of parentheses and store it
         tbl.append(row[1:-1])
-        sidx += len(row)
+        # Find the left parenthesis of the next row from the end of current row
+        sidx = values.find('(', sidx+len(row)) 
 
     # Parse the table
     reader = csv.reader(tbl, 
@@ -134,7 +137,8 @@ def main():
             # Look for an INSERT statement and parse it.
             if is_insert(line):
             # Print the prefix of the insert statement to show its table name.
-                print >> sys.stdout, get_insert_prefix(line)
+                tbl_title = get_insert_prefix(line)
+                print >> sys.stdout, tbl_title
 
                 values = get_values(line)
                 if values_sanity_check(values):
